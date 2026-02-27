@@ -56,7 +56,7 @@ if st.button("🚀 Analyze Resume"):
             with st.spinner("Analyzing resume..."):
 
                 response = requests.post(
-                    "http://127.0.0.1:8000/analyze",
+                    "https://ai-resume-rag-system.onrender.com/analyze",
                     files={"resume": resume_file},
                     params={"job_description": job_description}
                 )
