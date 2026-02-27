@@ -1,32 +1,15 @@
 from fastapi import FastAPI, UploadFile, File
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from utils.text_processing import extract_text_from_pdf, clean_text
 from io import BytesIO
 import numpy as np
 
-# -----------------------------
-# Initialize FastAPI
-# -----------------------------
 app = FastAPI()
 
-# -----------------------------
-# Lazy-loaded embedding model
-# -----------------------------
-model = None
-
-
-def get_model():
-    global model
-    if model is None:
-        model = SentenceTransformer("all-MiniLM-L6-v2")
-    return model
-
-
 @app.get("/")
-def health_check():
+def root():
     return {"status": "Backend is running"}
-
 
 @app.post("/analyze")
 async def analyze_resume(
@@ -34,39 +17,27 @@ async def analyze_resume(
     job_description: str = ""
 ):
     try:
-        # -----------------------------
-        # Read and process resume PDF
-        # -----------------------------
         contents = await resume.read()
         pdf_file = BytesIO(contents)
 
-        resume_text = extract_text_from_pdf(pdf_file)
-        resume_text = clean_text(resume_text)
+        resume_text = clean_text(extract_text_from_pdf(pdf_file))
         job_description = clean_text(job_description)
 
         if not resume_text:
             return {"error": "Could not extract text from PDF."}
 
-        # -----------------------------
-        # Load model safely (lazy)
-        # -----------------------------
-        model_instance = get_model()
-
-        # -----------------------------
-        # Semantic Similarity
-        # -----------------------------
-        embeddings = model_instance.encode([resume_text, job_description])
+        # -------- Lightweight Semantic Similarity --------
+        vectorizer = TfidfVectorizer(stop_words="english")
+        vectors = vectorizer.fit_transform([resume_text, job_description])
 
         similarity_score = cosine_similarity(
-            [embeddings[0]],
-            [embeddings[1]]
+            vectors[0:1],
+            vectors[1:2]
         )[0][0]
 
         similarity_percent = round(float(similarity_score) * 100, 2)
 
-        # -----------------------------
-        # Skill Matching
-        # -----------------------------
+        # -------- Skill Matching --------
         skill_keywords = [
             "python", "machine learning", "tensorflow", "pytorch",
             "llm", "rag", "vector database", "langchain",
@@ -88,9 +59,6 @@ async def analyze_resume(
                 2
             )
 
-        # -----------------------------
-        # Final Weighted Score
-        # -----------------------------
         final_score = round(
             (0.7 * similarity_percent) + (0.3 * skill_match_percent),
             2
