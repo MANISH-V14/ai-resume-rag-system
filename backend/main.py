@@ -10,8 +10,22 @@ import numpy as np
 # -----------------------------
 app = FastAPI()
 
-# Load embedding model once at startup
-model = SentenceTransformer("all-MiniLM-L6-v2")
+# -----------------------------
+# Lazy-loaded embedding model
+# -----------------------------
+model = None
+
+
+def get_model():
+    global model
+    if model is None:
+        model = SentenceTransformer("all-MiniLM-L6-v2")
+    return model
+
+
+@app.get("/")
+def health_check():
+    return {"status": "Backend is running"}
 
 
 @app.post("/analyze")
@@ -34,9 +48,14 @@ async def analyze_resume(
             return {"error": "Could not extract text from PDF."}
 
         # -----------------------------
+        # Load model safely (lazy)
+        # -----------------------------
+        model_instance = get_model()
+
+        # -----------------------------
         # Semantic Similarity
         # -----------------------------
-        embeddings = model.encode([resume_text, job_description])
+        embeddings = model_instance.encode([resume_text, job_description])
 
         similarity_score = cosine_similarity(
             [embeddings[0]],
