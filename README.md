@@ -22,8 +22,8 @@ It performs semantic similarity scoring and skill gap analysis using a lightweig
 Backend API:
 https://ai-resume-rag-system.onrender.com
 
-Frontend (if deployed separately):
-streamlit run frontend/streamlit_app.py
+Frontend:
+https://ai-resume-rag-system-b3hq35jwmnsnlzfvtxakta.streamlit.app/
 
 --Project Overview
 
