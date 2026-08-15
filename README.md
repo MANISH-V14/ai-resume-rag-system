@@ -13,6 +13,7 @@ This system evaluates candidate-job fit using:
 - Streamlit interactive frontend
 
 - AI Resume Screening & RAG Evaluation System
+- Today: Reviewed RAG chunking strategies and semantic search.
 
 A production-ready resume–job description evaluation platform built with FastAPI and Streamlit.
 It performs semantic similarity scoring and skill gap analysis using a lightweight, deployment-optimized architecture.
