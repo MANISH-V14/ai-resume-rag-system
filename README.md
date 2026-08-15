@@ -1,175 +1,100 @@
-# 🧠 AI Resume Screening & RAG Evaluation System
+# AI Resume Screening & RAG Evaluation System
 
-## 🏗 System Architecture
+A resume-to-job-description evaluation application built with FastAPI and Streamlit. The current deployment uses a lightweight TF-IDF similarity pipeline with explicit skill matching, while the project architecture is designed to support future embedding-based retrieval.
+
+## Live Demo
+
+**Backend API:** https://ai-resume-rag-system.onrender.com
+
+**Frontend:** https://ai-resume-rag-system-b3hq35jwmnsnlzfvtxakta.streamlit.app/
+
+## System Architecture
 
 ![Architecture](architecture.png)
 
-This system evaluates candidate-job fit using:
+`Resume PDF → Streamlit → FastAPI → Text Extraction → Cleaning → TF-IDF Vectorization → Cosine Similarity → Skill Matching → Composite Score`
 
-- Semantic similarity via SentenceTransformers
-- Skill gap analysis using keyword intersection
-- Weighted scoring mechanism
-- FastAPI backend
-- Streamlit interactive frontend
+## Project Overview
 
-- AI Resume Screening & RAG Evaluation System
-- Today: Reviewed RAG chunking strategies and semantic search.
+The application evaluates candidate-job alignment using two complementary signals:
 
-A production-ready resume–job description evaluation platform built with FastAPI and Streamlit.
-It performs semantic similarity scoring and skill gap analysis using a lightweight, deployment-optimized architecture.
+- Semantic similarity between resume and job-description text
+- Explicit skill overlap and skill-gap detection
 
---Live Demo
+The results are combined into a weighted score and returned through the API for visualization in the frontend.
 
-Backend API:
-https://ai-resume-rag-system.onrender.com
+## Scoring Methodology
 
-Frontend:
-https://ai-resume-rag-system-b3hq35jwmnsnlzfvtxakta.streamlit.app/
+### Semantic Similarity
 
---Project Overview
+The deployed version uses TF-IDF vectorization and cosine similarity. This keeps memory usage low and makes the application practical for lightweight cloud instances.
 
-This system evaluates how well a resume aligns with a job description using:
+### Skill Match
 
-Semantic similarity scoring
+A curated technical keyword set is used to identify matched and missing skills and calculate a skill-alignment percentage.
 
-Skill gap detection
+### Composite Score
 
-Weighted composite scoring
+`Final Score = (0.7 × Semantic Similarity) + (0.3 × Skill Match)`
 
-REST API backend
+The weighting gives more importance to overall textual alignment while still rewarding explicit skill coverage.
 
-Interactive UI with score visualization
+## Why TF-IDF?
 
-Cloud deployment (Render)
+Transformer embeddings can improve semantic retrieval, but they also increase memory and deployment requirements. TF-IDF provides a lightweight baseline that:
 
-It simulates how enterprise ATS and AI screening systems evaluate candidates.
+- Reduces memory footprint
+- Keeps deployment simple
+- Provides interpretable similarity scoring
+- Leaves a clear upgrade path to transformer embeddings or a vector database
 
-🏗️ Architecture
+## Tech Stack
 
-User Uploads Resume (PDF)
-→ Streamlit Frontend
-→ FastAPI Backend
-→ PDF Text Extraction
-→ Text Cleaning
-→ Vectorization (TF-IDF)
-→ Cosine Similarity
-→ Skill Matching Engine
-→ Final Weighted Score
-→ JSON Response
+### Backend
 
-⚙️ Scoring Methodology
- Semantic Similarity
+- FastAPI
+- Scikit-learn
+- TF-IDF Vectorizer
+- Cosine Similarity
+- PDF text extraction
+- Uvicorn
 
-Uses TF-IDF vectorization
+### Frontend
 
-Computes cosine similarity between resume and job description
+- Streamlit
+- Plotly visualization
 
-Measures contextual alignment
+### Deployment
 
-Why TF-IDF instead of transformers?
+- Render
+- Python 3.10
 
-The system was optimized for cloud deployment and memory efficiency.
-Transformer models significantly increase memory usage in small instances.
+## Example Output
 
-This architecture:
-
-Reduces memory footprint
-
-Improves deployment stability
-
-Maintains reliable similarity scoring
-
-Allows easy future upgrade to transformer embeddings
-
---Skill Match Analysis
-
-A curated technical keyword set is used to:
-
-Identify matched skills
-
-Detect missing skills
-
-Calculate skill alignment percentage
-
-This simulates ATS keyword matching behavior combined with contextual scoring.
-
---- Final Composite Score
-
-Final Score =
-(0.7 × Semantic Similarity) + (0.3 × Skill Match)
-
-This hybrid scoring mirrors real-world resume filtering systems that combine contextual understanding and explicit skill presence.
-
-🛠️ Tech Stack
-
-Backend:
-
-FastAPI
-
-Scikit-learn
-
-TF-IDF Vectorizer
-
-Cosine Similarity
-
-PDF Parsing
-
-Uvicorn
-
-Frontend:
-
-Streamlit
-
-Plotly Gauge Visualization
-
-Deployment:
-
-Render Web Service
-
-Python 3.10
-
-Memory-optimized design
-
-📊 Example Output
-
+```text
 Final Score: 75.87%
 Semantic Similarity: 65.53%
 Skill Match: 100%
 
 Matched Skills:
 python, aws, docker, kubernetes, machine learning
+```
 
-Missing Skills:
-None detected
+## Engineering Highlights
 
-💡 Engineering Highlights
+- End-to-end ML application architecture
+- REST API design
+- PDF upload and text processing
+- Similarity and skill-matching logic
+- Interactive score visualization
+- Cloud deployment under constrained memory
 
-Full-stack ML application
+## Future Improvements
 
-REST API design
-
-File upload handling
-
-Vector similarity modeling
-
-Scalable scoring logic
-
-Deployment under constrained memory
-
-Cloud-based production setup
-
----Future Improvements
-
-Swap TF-IDF with transformer embeddings (MiniLM, OpenAI, etc.)
-
-Add vector database (FAISS / Pinecone)
-
-Implement resume section-level scoring
-
-Add recruiter dashboard analytics
-
-Add feedback-based learning loop
-
-Add authentication & user accounts
-
-Deploy CI/CD pipeline
+- Replace TF-IDF with transformer embeddings such as MiniLM
+- Add FAISS or another vector index for retrieval
+- Add resume section-level scoring
+- Add recruiter analytics
+- Introduce a feedback-based evaluation loop
+- Add authentication and user accounts
+- Expand automated testing and CI/CD
